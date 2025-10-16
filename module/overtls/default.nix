@@ -20,6 +20,12 @@ in
       description = "The OverTLS package to use";
     };
 
+    role = mkOption {
+      type = types.str;
+      description = "The role of the OverTLS proxy";
+      example = "server";
+    };
+
     config = mkOption {
       type = types.str;
       description = "OverTLS configuration file content";
@@ -57,7 +63,7 @@ in
       serviceConfig = {
         Type = "simple";
         DynamicUser = true;
-        ExecStart = "${cfg.package}/bin/overtls -c /etc/overtls/config.json";
+        ExecStart = "${cfg.package}/bin/overtl -r ${cfg.role} -c /etc/overtls/config.json";
         Restart = "always";
         RestartSec = "5";
         StandardOutput = "journal";

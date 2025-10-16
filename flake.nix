@@ -17,7 +17,7 @@
         hf_proxy = pkgs.callPackage ./pkg/hf_proxy/default.nix { };
         xray-docker = pkgs.callPackage ./pkg/xray-docker/pakcage.nix { };
         overtls = pkgs.callPackage ./pkg/overtls/default.nix { };
-      };1
+      };
 
       # NixOS modules
       nixosModules = {

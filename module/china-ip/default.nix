@@ -93,6 +93,25 @@ in
             # Skip empty lines and comments
             [[ -z "$line" || "$line" =~ ^# ]] && continue
             
+            # Validate IP format: only allow digits, dots, and slashes
+            # This prevents command injection by ensuring only valid CIDR notation
+            if ! [[ "$line" =~ ^[0-9./]+$ ]]; then
+              errors=$((errors + 1))
+              if [ $errors -le 5 ]; then
+                echo "Warning: Invalid IP format (contains illegal characters): $line"
+              fi
+              continue
+            fi
+            
+            # Additional validation: check for valid CIDR format (x.x.x.x/x)
+            if ! [[ "$line" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}(/[0-9]{1,2})?$ ]]; then
+              errors=$((errors + 1))
+              if [ $errors -le 5 ]; then
+                echo "Warning: Invalid CIDR format: $line"
+              fi
+              continue
+            fi
+            
             # Add IP to ipset, capture errors but continue processing
             if output=$(ipset add ${cfg.ipsetName} "$line" 2>&1); then
               count=$((count + 1))
@@ -203,6 +222,9 @@ in
               count=0
               while IFS= read -r line; do
                 [[ -z "$line" || "$line" =~ ^# ]] && continue
+                # Validate IP format to prevent command injection
+                [[ ! "$line" =~ ^[0-9./]+$ ]] && continue
+                [[ ! "$line" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}(/[0-9]{1,2})?$ ]] && continue
                 ipset add ${cfg.ipsetName} "$line" 2>/dev/null && count=$((count + 1))
               done < "$CACHE_FILE"
               
@@ -222,6 +244,9 @@ in
             count=0
             while IFS= read -r line; do
               [[ -z "$line" || "$line" =~ ^# ]] && continue
+              # Validate IP format to prevent command injection
+              [[ ! "$line" =~ ^[0-9./]+$ ]] && continue
+              [[ ! "$line" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}(/[0-9]{1,2})?$ ]] && continue
               ipset add ${cfg.ipsetName} "$line" 2>/dev/null && count=$((count + 1))
             done < "$CACHE_FILE"
             echo "Created ipset and loaded $count entries from cache"

@@ -21,9 +21,9 @@
 
       # NixOS modules
       nixosModules = {
-        hysteria2 = ./module/hyateria2;
+        hysteria2 = ./module/hysteria2;
         overtls = ./module/overtls;
-
+        china-ip = ./module/china-ip;
       };
     };
 }

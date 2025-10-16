@@ -63,7 +63,7 @@ in
       serviceConfig = {
         Type = "simple";
         DynamicUser = true;
-        ExecStart = "${cfg.package}/bin/overtl -r ${cfg.role} -c /etc/overtls/config.json";
+        ExecStart = "${cfg.package}/bin/overtls -r ${cfg.role} -c /etc/overtls/config.json";
         Restart = "always";
         RestartSec = "5";
         StandardOutput = "journal";
@@ -81,7 +81,7 @@ in
 
     environment.etc."overtls/config.json" = {
       text = cfg.config;
-      mode = "0600";
+      mode = "0644";
     };
   };
 }
